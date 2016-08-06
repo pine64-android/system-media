@@ -569,6 +569,39 @@ int audio_route_update_mixer(struct audio_route *ar)
     return 0;
 }
 
+int audio_route_update_mixer_old_value(struct audio_route *ar)
+{
+	unsigned int i;
+    unsigned int j;
+    unsigned int num_values;
+    struct mixer_ctl *ctl;
+    enum mixer_ctl_type type;
+
+	for (i = 0; i < ar->num_mixer_ctls; i++) {
+        ctl = mixer_get_ctl(ar->mixer, i);
+        num_values = mixer_ctl_get_num_values(ctl);
+
+        ar->mixer_state[i].ctl = ctl;
+        ar->mixer_state[i].num_values = num_values;
+
+        /* Skip unsupported types that are not supported yet in XML */
+        type = mixer_ctl_get_type(ctl);
+
+        if (!is_supported_ctl_type(type))
+            continue;
+
+        if (type == MIXER_CTL_TYPE_ENUM)
+            ar->mixer_state[i].old_value[0] = mixer_ctl_get_value(ctl, 0);
+        else
+            mixer_ctl_get_array(ctl, ar->mixer_state[i].old_value, num_values);
+        //memcpy(ar->mixer_state[i].new_value, ar->mixer_state[i].old_value,
+               //num_values * sizeof(int));
+    }
+
+    return 0;
+}
+
+
 /* saves the current state of the mixer, for resetting all controls */
 static void save_mixer_state(struct audio_route *ar)
 {

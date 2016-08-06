@@ -43,6 +43,9 @@ void audio_route_reset(struct audio_route *ar);
 /* Update the mixer with any changed values */
 int audio_route_update_mixer(struct audio_route *ar);
 
+int audio_route_update_mixer_old_value(struct audio_route *ar);
+
+
 #if defined(__cplusplus)
 }  /* extern "C" */
 #endif
